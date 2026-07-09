@@ -14,8 +14,11 @@
     "jest": "^30.4.2",
     "react": "19.2.3",
     "react-native": "0.86.0",
+    "react-native-get-random-values": "^2.0.0",
     "react-redux": "^9.3.0",
-    "redux": "^5.0.1"
+    "redux": "^5.0.1",
+    "ts-jest": "^29.4.11",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
