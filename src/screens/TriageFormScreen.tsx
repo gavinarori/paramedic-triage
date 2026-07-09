@@ -44,33 +44,28 @@ export default function TriageFormScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   // Load persisted records and start the sync engine once, on mount.
-  useEffect(() => {
-    dispatch(loadTriages());
-    syncService.start();
+useEffect(() => {
+  dispatch(loadTriages());
+  // NOTE: syncService.start() is called once in App.tsx, not here.
+  // This screen only subscribes to status updates.
 
-    // Bridge sync engine events -> Redux, so the UI reacts to connectivity
-    // and sync progress without polling.
-    const unsubscribe = syncService.subscribe((status) => {
-      dispatch(setOnlineStatus(status.isOnline));
+  const unsubscribe = syncService.subscribe((status) => {
+    dispatch(setOnlineStatus(status.isOnline));
 
-      if (status.isSyncing) {
-        dispatch(syncStarted());
-      } else if (status.lastResult) {
-        dispatch(syncFinished(status.lastResult));
-        // Pull the freshest synced/unsynced flags from storage into Redux
-        // so pending counts and badges update immediately after a run.
-        dispatch(loadTriages());
-      }
-    });
+    if (status.isSyncing) {
+      dispatch(syncStarted());
+    } else if (status.lastResult) {
+      dispatch(syncFinished(status.lastResult));
+      dispatch(loadTriages());
+    }
+  });
 
-    return () => {
-      unsubscribe();
-      // Intentionally NOT calling syncService.stop() here: the engine should
-      // keep listening for connectivity while the app is alive, even if
-      // this screen unmounts (single-screen app, but this pattern is
-      // correct practice for multi-screen apps too).
-    };
-  }, [dispatch]);
+  return () => {
+    unsubscribe();
+  };
+}, [dispatch]);
+
+
 
   const handleSubmit = useCallback(
     async (input: NewTriageInput) => {
